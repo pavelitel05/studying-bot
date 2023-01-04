@@ -18,7 +18,7 @@ public class Timetable {
     private String dateTime;
 
     @Column(name = "student", nullable = false)
-    private String name;
+    private String studentName;
 
     @Column(name = "topic")
     private String topic;
