@@ -1,7 +1,6 @@
 package com.example.tgbot.utils;
 
 import com.example.tgbot.config.TelegramBotConfigurationProperties;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
@@ -13,7 +12,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Component
-@Slf4j
 public class TelegramBot extends TelegramWebhookBot {
     private final TelegramBotConfigurationProperties config;
     @Autowired
@@ -28,7 +26,6 @@ public class TelegramBot extends TelegramWebhookBot {
             Message mes = update.getMessage();
             message.setText(mes.getText());
             message.setChatId(mes.getChatId());
-            log.info("bot");
             return message;
         }
         throw new UnsupportedOperationException();

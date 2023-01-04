@@ -21,7 +21,6 @@ public class Controller {
 
     @PostMapping
     public BotApiMethod<?> onUpdateReceived(@RequestBody Update update){
-        log.info("Controller");
         return telegramBot.onWebhookUpdateReceived(update);
     }
 }
