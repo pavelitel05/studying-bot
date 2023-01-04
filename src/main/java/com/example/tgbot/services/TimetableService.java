@@ -3,9 +3,11 @@ package com.example.tgbot.services;
 import com.example.tgbot.domain.Timetable;
 import com.example.tgbot.repositories.TimetableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class TimetableService {
     private final TimetableRepository timetableRepository;
 

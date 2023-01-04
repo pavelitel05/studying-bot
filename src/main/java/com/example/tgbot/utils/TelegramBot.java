@@ -1,8 +1,9 @@
 package com.example.tgbot.utils;
 
 import com.example.tgbot.config.TelegramBotConfigurationProperties;
-import com.example.tgbot.domain.User;
-import com.example.tgbot.services.UserService;
+import com.example.tgbot.domain.Timetable;
+import com.example.tgbot.services.TimetableService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
@@ -13,8 +14,11 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+@Slf4j
 @Component
 public class TelegramBot extends TelegramWebhookBot {
+    @Autowired
+    TimetableService ts;
 
     private final TelegramBotConfigurationProperties config;
     @Autowired
