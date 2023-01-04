@@ -29,4 +29,15 @@ public class User {
 
     @Column(name = "module")
     private String module;
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", chatId=" + chatId +
+                ", role='" + role + '\'' +
+                ", module='" + module + '\'' +
+                '}';
+    }
 }
