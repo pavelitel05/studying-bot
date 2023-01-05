@@ -62,4 +62,12 @@ public class UserService {
         log.info("Nu users yet");
         throw new NoSuchElementException();
     }
+
+    public User getUserByName(String name){
+        if (userRepository.findUserByName(name).isPresent()){
+            return userRepository.findUserByName(name).get();
+        }
+        log.info("Nu such user with name" + name);
+        throw new NoSuchElementException();
+    }
 }
