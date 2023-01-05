@@ -6,7 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
 public class CallbackQueryHandler {
-    public BotApiMethod<?> answerCallbackQuery(Update update) {
+    public BotApiMethod<?> answerCallbackQuery(Update update) {;
         throw new UnsupportedOperationException();
     }
 }

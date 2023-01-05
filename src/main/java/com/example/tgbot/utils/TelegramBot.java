@@ -4,6 +4,7 @@ import com.example.tgbot.config.TelegramBotConfigurationProperties;
 import com.example.tgbot.handlers.CallbackQueryHandler;
 import com.example.tgbot.handlers.CommandHandler;
 import com.example.tgbot.handlers.MessageHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
@@ -33,12 +34,13 @@ public class TelegramBot extends TelegramWebhookBot {
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
         if (update.hasCallbackQuery()){
-            callbackQueryHandler.answerCallbackQuery(update);
-        } else if (update.hasMessage()) {
+            return callbackQueryHandler.answerCallbackQuery(update);
+        }
+        if (update.hasMessage()) {
             if (update.getMessage().getText().charAt(0) == '/'){
-                commandHandler.answerCommand(update);
+                return commandHandler.answerCommand(update);
             } else{
-                messageHandler.answerMessage(update);
+                return messageHandler.answerMessage(update);
             }
         }
         throw new UnsupportedOperationException();
