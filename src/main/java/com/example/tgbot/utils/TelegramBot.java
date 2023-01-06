@@ -1,39 +1,47 @@
 package com.example.tgbot.utils;
 
 import com.example.tgbot.config.TelegramBotConfigurationProperties;
-import com.example.tgbot.domain.Timetable;
-import com.example.tgbot.services.TimetableService;
+import com.example.tgbot.handlers.CallbackQueryHandler;
+import com.example.tgbot.handlers.CommandHandler;
+import com.example.tgbot.handlers.MessageHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-@Slf4j
 @Component
 public class TelegramBot extends TelegramWebhookBot {
-    @Autowired
-    TimetableService ts;
-
     private final TelegramBotConfigurationProperties config;
+    private final MessageHandler messageHandler;
+    private final CallbackQueryHandler callbackQueryHandler;
+    private final CommandHandler commandHandler;
     @Autowired
-    public TelegramBot(TelegramBotConfigurationProperties config) {
+    public TelegramBot(TelegramBotConfigurationProperties config,
+                       CallbackQueryHandler callbackQueryHandler,
+                       MessageHandler messageHandler,
+                       CommandHandler commandHandler) {
         this.config = config;
+        this.callbackQueryHandler = callbackQueryHandler;
+        this.messageHandler = messageHandler;
+        this.commandHandler = commandHandler;
     }
+
 
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
-        SendMessage message = new SendMessage();
-        if (update.hasMessage()){
-            Message mes = update.getMessage();
-            message.setText(mes.getText());
-            message.setChatId(mes.getChatId());
-            return message;
+        if (update.hasCallbackQuery()){
+            return callbackQueryHandler.answerCallbackQuery(update);
+        }
+        if (update.hasMessage()) {
+            if (update.getMessage().getText().charAt(0) == '/'){
+                return commandHandler.answerCommand(update);
+            } else if (update.getMessage().hasText()){
+                return messageHandler.answerMessage(update);
+            }
         }
         throw new UnsupportedOperationException();
     }
