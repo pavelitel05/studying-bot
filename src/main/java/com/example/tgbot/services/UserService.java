@@ -19,10 +19,14 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+
     public void setUser(User user){
         userRepository.save(user);
     }
 
+    public boolean existsById(Long id){
+        return userRepository.existsById(id);
+    }
     public User getUserById(Long id){
         if (userRepository.findById(id).isPresent()){
             return userRepository.findById(id).get();
@@ -31,28 +35,22 @@ public class UserService {
         throw new NoSuchElementException();
     }
 
-    public User getUserByChatId(Long chatId){
-        if (userRepository.findByChatId(chatId).isPresent()){
-            return userRepository.findByChatId(chatId).get();
-        }
-        log.info("Nu such user with chatId: " + chatId);
-        throw new NoSuchElementException();
-    }
-
-    public void deleteUser(User user){
-        if (userRepository.findById(user.getId()).isPresent()){
+    public boolean deleteUser(User user){
+        if (userRepository.findById(user.getChatId()).isPresent()){
             userRepository.delete(user);
+            return true;
         }
         log.info("Nu such user to delete: " + user);
-        throw new NoSuchElementException();
+        return false;
     }
 
-    public void deleteUserById(Long id){
+    public boolean deleteUserById(Long id){
         if (userRepository.findById(id).isPresent()){
             userRepository.deleteById(id);
+            return true;
         }
         log.info("Nu such user to delete with id: " + id);
-        throw new NoSuchElementException();
+        return false;
     }
 
     public List<User> getUsers(){

@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @Component
 @NoArgsConstructor
-public class Dialog {
+public class InlineDialog {
     private List<String> buttonsText;
 
     public InlineKeyboardMarkup getMarkup(){

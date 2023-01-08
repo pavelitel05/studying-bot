@@ -1,6 +1,8 @@
 package com.example.tgbot.handlers;
 
 import com.example.tgbot.domain.User;
+import com.example.tgbot.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -9,6 +11,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
 public class CommandHandler {
+    @Autowired
+    private UserService userService;
     public BotApiMethod<?> answerCommand(Update update) {
         Message message = update.getMessage();
         SendMessage sendMessage = new SendMessage();
@@ -27,16 +31,33 @@ public class CommandHandler {
                                     "2. /start\n" +
                                     "3. /authorization\n" +
                                     "Доступные после авторизации:\n" +
-                                    "coming soon");
+                                    "4. /logout");
                 return sendMessage;
             case "/authorization":
+                // валидация
+                if (userService.existsById(message.getChatId())){
+                    sendMessage.setText("❗Вы уже авторизированы❗\n" +
+                                        "Если хотите выйти из учетной записи воспользуйтесь:\n" +
+                                        "/logout\n");
+                    return sendMessage;
+                }
                 //Creating not authorized user
                 User user = new User();
                 user.setName("Not authorized");
                 user.setChatId(message.getChatId());
+                user.setStatus("request-password");
+                userService.setUser(user);
                 sendMessage.setText("Введите вам выданный пароль");
-                sendMessage.setReplyToMessageId(1);
                 return sendMessage;
+            case "/logout":
+                if (userService.existsById(message.getChatId())){
+                    userService.deleteUserById(message.getChatId());
+                    sendMessage.setText("Успешно!");
+                    return sendMessage;
+                } else {
+                    sendMessage.setText("Вы еще не авторизированы");
+                    return sendMessage;
+                }
             default:
                 sendMessage.setText("Не знаю такой команды!");
                 return sendMessage;

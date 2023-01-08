@@ -2,9 +2,11 @@ package com.example.tgbot.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "users")
@@ -13,16 +15,11 @@ import javax.persistence.*;
 public class User {
 
     @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(generator = "increment")
-    @GenericGenerator(name = "increment", strategy = "increment")
-    private Long id;
+    @Column(name = "chatId", nullable = false)
+    private Long chatId;
 
     @Column(name = "name", nullable = false)
     private String name;
-
-    @Column(name = "chatId", nullable = false)
-    private Long chatId;
 
     @Column(name = "role")
     private String role;
@@ -30,12 +27,15 @@ public class User {
     @Column(name = "module")
     private String module;
 
+    @Column(name = "status")
+    private String status;
+
+
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
+                "id=" + chatId +
                 ", name='" + name + '\'' +
-                ", chatId=" + chatId +
                 ", role='" + role + '\'' +
                 ", module='" + module + '\'' +
                 '}';
