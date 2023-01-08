@@ -17,6 +17,9 @@ public class MessageHandler {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private CommandHandler commandHandler;
+
     public BotApiMethod<?> answerMessage(Update update) {
         SendMessage sendMessage = new SendMessage();
         Message receivedMessage = update.getMessage();
@@ -28,6 +31,8 @@ public class MessageHandler {
                 return authorization.setName(receivedMessage);
             } else if ("request-module".equals(status)) {
                 return authorization.setModule(update);
+            } else if ("request-timetable".equals(status)) {
+                return commandHandler.setLessonForStudent(receivedMessage);
             }
         }
         sendMessage.setChatId(receivedMessage.getChatId());

@@ -18,12 +18,12 @@ public class Authentication {
         if (userService.existsById(id)){
             User user = userService.getUserById(id);
             String role = user.getRole();
-            switch (role.toLowerCase()) {
-                case "viewer":
+            switch (role) {
+                case "Viewer":
                     return "low";
-                case "student":
+                case "Student":
                     return "medium";
-                case "teacher":
+                case "Teacher":
                     return "high";
             }
         } else {

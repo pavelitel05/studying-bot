@@ -28,4 +28,15 @@ public class Timetable {
 
     @Column(name = "mark")
     private String mark;
+
+    @Override
+    public String toString() {
+        return "Timetable{" +
+                "id=" + id +
+                ", dateTime='" + dateTime + '\'' +
+                ", studentName='" + studentName + '\'' +
+                ", topic='" + topic + '\'' +
+                ", mark='" + mark + '\'' +
+                '}';
+    }
 }

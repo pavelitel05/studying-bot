@@ -5,6 +5,7 @@ import com.example.tgbot.domain.User;
 import com.example.tgbot.security.Authentication;
 import com.example.tgbot.services.TimetableService;
 import com.example.tgbot.services.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -13,6 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
+@Slf4j
 public class CommandHandler {
     @Autowired
     private UserService userService;
@@ -112,13 +114,16 @@ public class CommandHandler {
             var user = userService.getUserById(message.getChatId());
             if ("request-timetable".equals(user.getStatus())){
                 String[] entry = sendMessage.getText().split("\n");
+                log.info(entry.toString());
                 Timetable timetable = new Timetable();
                 timetable.setStudentName(entry[0]);
                 timetable.setDateTime(entry[1]);
+                log.info(timetable.toString());
                 timetableService.setEntryInTimetable(timetable);
                 sendMessage.setText("Успешно");
             } else {
                 user.setStatus("request-timetable");
+                userService.setUser(user);
                 sendMessage.setText("Введите данные по шаблону:\n" +
                                     "ФИО ученика\n" +
                                     "День недели - время");
