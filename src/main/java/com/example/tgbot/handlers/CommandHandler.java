@@ -2,6 +2,8 @@ package com.example.tgbot.handlers;
 
 import com.example.tgbot.domain.Timetable;
 import com.example.tgbot.domain.User;
+import com.example.tgbot.security.Authentication;
+import com.example.tgbot.services.TimetableService;
 import com.example.tgbot.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,6 +16,11 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class CommandHandler {
     @Autowired
     private UserService userService;
+    @Autowired
+    private Authentication authentication;
+
+    @Autowired
+    private TimetableService timetableService;
     public BotApiMethod<?> answerCommand(Update update) {
         Message message = update.getMessage();
         SendMessage sendMessage = new SendMessage();
@@ -61,6 +68,8 @@ public class CommandHandler {
                 }
             case "/set_my_lessons":
                 return setMyLessons(message);
+            case "/set_lesson_for_student":
+                return setLessonForStudent(message);
             default:
                 sendMessage.setText("Не знаю такой команды!");
                 return sendMessage;
@@ -70,26 +79,55 @@ public class CommandHandler {
     public BotApiMethod<?> setMyLessons(Message message){
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(message.getChatId());
-        if ("request-timetable".equals(userService
-                .getUserById(message.getChatId())
-                .getStatus())){
-            String[] entries = message.getText().split("\n");
-            for (String entry: entries){
-                Timetable timetable = new Timetable();
-                timetable.setStudentName(userService.getUserById(message.getChatId()).getName());
-                timetable.setDateTime(entry);
-                sendMessage.setText("Надеюсь вы не накосячили в записи, ибо делать валидацию мне лень");
-                return sendMessage;
-            }
+        if ("medium".equals(authentication.getPermission(message.getChatId())) ||
+            "high".equals(authentication.getPermission(message.getChatId()))) {
+            if ("request-timetable".equals(userService
+                    .getUserById(message.getChatId())
+                    .getStatus())) {
+                String[] entries = message.getText().split("\n");
+                for (String entry : entries) {
+                    Timetable timetable = new Timetable();
+                    timetable.setStudentName(userService.getUserById(message.getChatId()).getName());
+                    timetable.setDateTime(entry);
+                    sendMessage.setText("Надеюсь вы не накосячили в записи, ибо делать валидацию мне лень");
+                }
 
-        } else{
-            sendMessage.setText("Напишите ваше расписание в формате:\n" +
-                                "День недели (Полностью) - время в формате (ч:м)");
-            var user = userService.getUserById(message.getChatId());
-            user.setStatus("request-timetable");
-            userService.setUser(user);
-            return sendMessage;
+            } else {
+                sendMessage.setText("Напишите ваше расписание в формате:\n" +
+                        "День недели (Полностью) - время в формате (ч:м)");
+                var user = userService.getUserById(message.getChatId());
+                user.setStatus("request-timetable");
+                userService.setUser(user);
+            }
+        }else {
+            sendMessage.setText("Извините, вас нет доступа к использованию этой команды!");
         }
-        throw new UnsupportedOperationException();
+        return sendMessage;
     }
+
+    public BotApiMethod<?> setLessonForStudent(Message message){
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(message.getChatId());
+        if ("high".equals(authentication.getPermission(message.getChatId()))){
+            var user = userService.getUserById(message.getChatId());
+            if ("request-timetable".equals(user.getStatus())){
+                String[] entry = sendMessage.getText().split("\n");
+                Timetable timetable = new Timetable();
+                timetable.setStudentName(entry[0]);
+                timetable.setDateTime(entry[1]);
+                timetableService.setEntryInTimetable(timetable);
+                sendMessage.setText("Успешно");
+            } else {
+                user.setStatus("request-timetable");
+                sendMessage.setText("Введите данные по шаблону:\n" +
+                                    "ФИО ученика\n" +
+                                    "День недели - время");
+            }
+        }else {
+            sendMessage.setText("Извините, вас нет доступа к использованию этой команды!");
+        }
+        return sendMessage;
+    }
+
+
 }

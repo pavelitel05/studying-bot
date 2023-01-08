@@ -14,16 +14,20 @@ public class Authentication {
         this.userService = userService;
     }
 
-    public String getPermission(String name){
-        User user = userService.getUserByName(name);
-        String role = user.getRole();
-        switch (role.toLowerCase()){
-            case "viewer":
-                return "low";
-            case "student":
-                return "medium";
-            case "teacher":
-                return "high";
+    public String getPermission(Long id){
+        if (userService.existsById(id)){
+            User user = userService.getUserById(id);
+            String role = user.getRole();
+            switch (role.toLowerCase()) {
+                case "viewer":
+                    return "low";
+                case "student":
+                    return "medium";
+                case "teacher":
+                    return "high";
+            }
+        } else {
+            return "low";
         }
         throw new NullPointerException();
     }
