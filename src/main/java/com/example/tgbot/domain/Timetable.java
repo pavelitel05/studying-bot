@@ -2,11 +2,9 @@ package com.example.tgbot.domain;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "timetable")
@@ -14,7 +12,12 @@ import javax.persistence.Table;
 @Setter
 public class Timetable {
     @Id
-    @Column(name = "dateTime", nullable = false)
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(generator = "increment")
+    @GenericGenerator(name = "increment", strategy = "increment")
+    private Long id;
+
+    @Column(name = "dateTime")
     private String dateTime;
 
     @Column(name = "student", nullable = false)
@@ -23,6 +26,6 @@ public class Timetable {
     @Column(name = "topic")
     private String topic;
 
-    @Column(name = "status")
-    private String status;
+    @Column(name = "mark")
+    private String mark;
 }

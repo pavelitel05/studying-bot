@@ -1,5 +1,6 @@
 package com.example.tgbot.handlers;
 
+import com.example.tgbot.domain.Timetable;
 import com.example.tgbot.domain.User;
 import com.example.tgbot.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,9 +59,37 @@ public class CommandHandler {
                     sendMessage.setText("Вы еще не авторизированы");
                     return sendMessage;
                 }
+            case "/set_my_lessons":
+                return setMyLessons(message);
             default:
                 sendMessage.setText("Не знаю такой команды!");
                 return sendMessage;
         }
+    }
+
+    public BotApiMethod<?> setMyLessons(Message message){
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(message.getChatId());
+        if ("request-timetable".equals(userService
+                .getUserById(message.getChatId())
+                .getStatus())){
+            String[] entries = message.getText().split("\n");
+            for (String entry: entries){
+                Timetable timetable = new Timetable();
+                timetable.setStudentName(userService.getUserById(message.getChatId()).getName());
+                timetable.setDateTime(entry);
+                sendMessage.setText("Надеюсь вы не накосячили в записи, ибо делать валидацию мне лень");
+                return sendMessage;
+            }
+
+        } else{
+            sendMessage.setText("Напишите ваше расписание в формате:\n" +
+                                "День недели (Полностью) - время в формате (ч:м)");
+            var user = userService.getUserById(message.getChatId());
+            user.setStatus("request-timetable");
+            userService.setUser(user);
+            return sendMessage;
+        }
+        throw new UnsupportedOperationException();
     }
 }
