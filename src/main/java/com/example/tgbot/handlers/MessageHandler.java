@@ -9,6 +9,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import javax.transaction.Transactional;
+
 @Component
 public class MessageHandler {
     @Autowired
@@ -20,6 +22,7 @@ public class MessageHandler {
     @Autowired
     private CommandHandler commandHandler;
 
+    @Transactional
     public BotApiMethod<?> answerMessage(Update update) {
         SendMessage sendMessage = new SendMessage();
         Message receivedMessage = update.getMessage();
@@ -32,7 +35,17 @@ public class MessageHandler {
             } else if ("request-module".equals(status)) {
                 return authorization.setModule(update);
             } else if ("request-timetable".equals(status)) {
-                return commandHandler.setLessonForStudent(receivedMessage);
+                if ("Teacher".equals(userService.getUserById(receivedMessage.getChatId()).getRole())){
+                    return commandHandler.setLessonForStudent(receivedMessage);
+                }else{
+                    return commandHandler.setMyLessons(receivedMessage);
+                }
+            } else if ("request-timetable-to-delete".equals(status)){
+                return commandHandler.deleteLesson(receivedMessage);
+            } else if ("request-timetable-to-mark".equals(status)){
+                return commandHandler.addMark(receivedMessage);
+            } else if ("request-mark".equals(status)) {
+                return commandHandler.addMark(receivedMessage);
             }
         }
         sendMessage.setChatId(receivedMessage.getChatId());

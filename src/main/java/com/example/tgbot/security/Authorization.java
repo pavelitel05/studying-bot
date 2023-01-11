@@ -29,42 +29,52 @@ public class Authorization {
     private final String studentPassword = System.getenv("STUDENT_PASSWORD");
 
     public BotApiMethod<?> checkPassword(Message message){
-        String messageText = message.getText();
         User user = userService.getUserById(message.getChatId());
         SendMessage sendMessage = new SendMessage();
-        if (messageText.equals(adminPassword)){
-            user.setRole("Teacher");
-        } else if (messageText.equals(studentPassword)){
-            user.setRole("Student");
-        } else {
-            user.setRole("Viewer");
-        }
-        user.setStatus("request-name");
-        userService.setUser(user);
+        String messageText = message.getText();
         sendMessage.setChatId(message.getChatId());
-        sendMessage.setText("Введите ФИО через пробел");
+        if (messageText.matches("[0-9]{3,}")){
+            if (messageText.equals(adminPassword)){
+                user.setRole("Teacher");
+            } else if (messageText.equals(studentPassword)){
+                user.setRole("Student");
+            }
+            user.setStatus("request-name");
+            userService.setUser(user);
+            sendMessage.setText("Введите ФИО через пробел");
+        } else {
+            sendMessage.setText("Не знаю такого пароля!\n Нарекаю вас наблюдателем");
+            user.setStatus("request-name");
+            user.setRole("Viewer");
+            userService.setUser(user);
+        }
         return sendMessage;
     }
 
     public BotApiMethod<?> setName(Message message){
-        String messageText = message.getText();
         User user = userService.getUserById(message.getChatId());
         SendMessage sendMessage = new SendMessage();
-        user.setName(messageText);
-        user.setStatus("request-module");
-        userService.setUser(user);
         sendMessage.setChatId(message.getChatId());
-        sendMessage.setText("Выберите предметную область");
-        List<String> buttons = new ArrayList<>();
-        buttons.add("ЕГЭ");
-        buttons.add("ОГЭ");
-        buttons.add("Python");
-        buttons.add("Java");
-        buttons.add("Школьная программа");
-        buttons.add("Все сразу");
-        buttons.add("Просто смотрю");
-        inlineDialog.setButtonsText(buttons);
-        sendMessage.setReplyMarkup(inlineDialog.getMarkup());
+        String messageText = message.getText();
+        if (messageText.matches("[А-я]{2,} [А-я]{2,} [А-я]{2,}")){
+            user.setName(messageText);
+            user.setStatus("request-module");
+            userService.setUser(user);
+            sendMessage.setText("Выберите предметную область");
+            List<String> buttons = new ArrayList<>();
+            buttons.add("ЕГЭ");
+            buttons.add("ОГЭ");
+            buttons.add("Python");
+            buttons.add("Java");
+            buttons.add("Школьная программа");
+            buttons.add("Все сразу");
+            buttons.add("Просто смотрю");
+            inlineDialog.setButtonsText(buttons);
+            sendMessage.setReplyMarkup(inlineDialog.getMarkup());
+        } else{
+            sendMessage.setText("Введите ФИО по примеру:\n" +
+                                "Фамилия Имя Отчество");
+        }
         return sendMessage;
     }
 

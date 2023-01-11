@@ -29,10 +29,18 @@ public class TimetableService {
     }
 
     public void deleteEntryInTimetableOnTime(String dateTime){
-        timetableRepository.deleteById(dateTime);
+        timetableRepository.deleteTimetableByDateTime(dateTime);
     }
 
     public void deleteEntriesFotStudent(String studentName){
         timetableRepository.deleteAllByStudentName(studentName);
+    }
+
+    public Timetable findTimetableByDateTime(String dateTime){
+        return timetableRepository.findTimetableByDateTime(dateTime);
+    }
+
+    public Timetable findTimetableByMark(String mark){
+        return timetableRepository.findTimetableByMark(mark);
     }
 }
