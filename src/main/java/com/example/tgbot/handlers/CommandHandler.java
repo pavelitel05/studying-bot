@@ -12,11 +12,14 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+
 
 @Component
 @Slf4j
@@ -58,7 +61,7 @@ public class CommandHandler {
     public BotApiMethod<?> setMyLessons(Message message){
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(message.getChatId());
-        AtomicBoolean validateFactor = new AtomicBoolean(false);
+        AtomicBoolean validateFactor = new AtomicBoolean(true);
         var user = userService.getUserById(message.getChatId());
         if ("medium".equals(authentication.getPermission(message.getChatId())) |
             "high".equals(authentication.getPermission(message.getChatId()))) {
@@ -66,14 +69,16 @@ public class CommandHandler {
                     .getUserById(message.getChatId())
                     .getStatus())) {
                 String[] entries = message.getText().split("\n");
-
                 Arrays.stream(entries).forEach(el -> {
-                    if (!el.matches("(понедельник|вторник|среда|четверг|пятница|суббота|воскресенье)\\s-\\s(00|01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23):[0-5][0-9]")){
-                        validateFactor.set(true);
+                    if (el.toLowerCase().matches("(понедельник|вторник|среда|четверг|пятница|суббота|воскресенье)\\s-\\s(00|01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23):[0-5][0-9]\n")){
+                        validateFactor.set(false);
                     }
                 });
                 if (validateFactor.get()){
-                    sendMessage.setText("Некорректный формат ввода, повторите попытку!");
+                    sendMessage.setText("Некорректный формат ввода, повторите попытку!\n" +
+                                        "Возможные проблемы:\n" +
+                                        "Лишние пробелы\n" +
+                                        "Не соблюдение шаблона (неверно или с ошибкой указаны день и время.");
                     return sendMessage;
                 }
                 for (String entry : entries) {
@@ -85,6 +90,7 @@ public class CommandHandler {
                 sendMessage.setText("Успешно!");
                 user.setStatus("authorized");
                 userService.setUser(user);
+                sendMessage.setReplyMarkup(new ReplyKeyboardMarkup());
             } else {
                 sendMessage.setText("Напишите ваше расписание в формате:\n" +
                                     "День недели (Полностью) - время в формате (ч:м)\n" +
@@ -176,15 +182,15 @@ public class CommandHandler {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(message.getChatId());
         sendMessage.setText("Список команд:\n" +
-                "1. /help\n" +
-                "2. /start\n" +
-                "3. /authorization\n" +
+                "1. /help - Список доступных команд (они так же есть в меню\uD83E\uDD2B)\n" +
+                "2. /start - Приветствие\uD83D\uDD96\n " +
+                "3. /authorization- Автоизируйтесь, чтобы получить больше возможностей (если вы ученик, конечно)\n" +
                 "Доступные после авторизации:\n" +
-                "4. /logout\n" +
-                "5. /cancel\n" +
-                "6. /set_my_lessons\n" +
-                "7. /delete_lesson\n" +
-                "8. /add_mark");
+                "4. /logout - Выход из учетной записи, может пригодится\n" +
+                "5. /cancel - Отмена последней примененной команды\n" +
+                "6. /set_my_lessons - Добавь себе уроков в расписание!\n" +
+                "7. /delete_lesson - Удалить их тоже можно\n" +
+                "8. /add_mark - Добавь заметку ко времени\n");
         return sendMessage;
     }
 
@@ -219,6 +225,9 @@ public class CommandHandler {
         return sendMessage;
     }
 
+    /*
+    deleteLesson() method removes entry which user chose
+     */
     public BotApiMethod<?> deleteLesson(Message message){
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(message.getChatId());
@@ -228,6 +237,7 @@ public class CommandHandler {
             user.setStatus("authorized");
             userService.setUser(user);
             sendMessage.setText("Удалено из расписания!");
+            sendMessage.setReplyMarkup(new ReplyKeyboardMarkup());
         } else {
             List<String> buttons = new ArrayList<>();
             for (Timetable timetable : timetableService
@@ -243,6 +253,9 @@ public class CommandHandler {
         return sendMessage;
     }
 
+    /*
+    addMark method() adds mark gave by user in entry chose by user
+     */
     public BotApiMethod<?> addMark(Message message){
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(message.getChatId());
@@ -259,6 +272,8 @@ public class CommandHandler {
             timetable.setMark(message.getText());
             sendMessage.setText("Заметка добавлена");
             timetableService.setEntryInTimetable(timetable);
+            user.setStatus("authorized");
+            userService.setUser(user);
         } else {
             user.setStatus("request-timetable-to-mark");
             userService.setUser(user);
