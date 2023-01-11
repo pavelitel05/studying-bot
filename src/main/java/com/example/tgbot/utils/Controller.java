@@ -19,6 +19,7 @@ public class Controller {
         this.telegramBot = telegramBot;
     }
 
+    //todo А если надо будет выполнить более одного действия?
     @PostMapping
     public BotApiMethod<?> onUpdateReceived(@RequestBody Update update){
         return telegramBot.onWebhookUpdateReceived(update);

@@ -14,6 +14,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.ArrayList;
 import java.util.List;
 
+//todo Если это сервис или компонент, то явно должно быть понятно что это
+//todo Например, AuthorizationService / AuthorizationProvider / AuthorizationManager
+//todo А нужна ли авторизация для телеги?
 @Component
 public class Authorization {
     private final UserService userService;
@@ -24,6 +27,7 @@ public class Authorization {
         this.inlineDialog = inlineDialog;
     }
 
+    //todo Мб вынес бы в проперти, а туда уже из ENV
     private final String adminPassword = System.getenv("ADMIN_ID");
 
     private final String studentPassword = System.getenv("STUDENT_PASSWORD");
@@ -33,6 +37,7 @@ public class Authorization {
         SendMessage sendMessage = new SendMessage();
         String messageText = message.getText();
         sendMessage.setChatId(message.getChatId());
+        //todo Такие моменты лучше комментить, потом забудешь
         if (messageText.matches("[0-9]{3,}")){
             if (messageText.equals(adminPassword)){
                 user.setRole("Teacher");
@@ -62,6 +67,7 @@ public class Authorization {
             userService.setUser(user);
             sendMessage.setText("Выберите предметную область");
             List<String> buttons = new ArrayList<>();
+            //todo ИМХО - предметы в отдельную табличку/массив
             buttons.add("ЕГЭ");
             buttons.add("ОГЭ");
             buttons.add("Python");
@@ -81,10 +87,13 @@ public class Authorization {
     public BotApiMethod<?> setModule(Update update){
         CallbackQuery callbackQuery = update.getCallbackQuery();
         User user = userService.getUserById(callbackQuery.getMessage().getChatId());
+        //todo создание SendMessage вынес бы в отдельную фабрику или используй билдер (SendMessage.builder()...build())
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(callbackQuery.getMessage().getChatId());
+        //todo ИМХО - заменил бы на "Привет, <Имя Фамилия>"
         sendMessage.setText("Успешно!");
         user.setModule(callbackQuery.getData());
+        //todo Вообще не понял зачем это
         user.setStatus("authorized");
         userService.setUser(user);
         return sendMessage;

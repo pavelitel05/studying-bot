@@ -13,6 +13,7 @@ import java.util.List;
 
 @Data
 @Component
+//todo Аналогично - зачем?
 @NoArgsConstructor
 public class ReplyDialog {
     private List<String> buttonsText;
@@ -20,6 +21,7 @@ public class ReplyDialog {
     public ReplyKeyboardMarkup getMarkup(){
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         List<KeyboardRow> rows = new ArrayList<>();
+        //todo Аналогично - NPE?
         for (int i = 0; i < this.buttonsText.size(); i += 2){
             KeyboardRow row = new KeyboardRow();
             KeyboardButton button = new KeyboardButton();

@@ -36,13 +36,17 @@ public class TelegramBot extends TelegramWebhookBot {
         if (update.hasCallbackQuery()){
             return callbackQueryHandler.answerCallbackQuery(update);
         }
+        //todo Я бы тут проверял hasText
         if (update.hasMessage()) {
+            //todo Интересно, а если текста нет? - NPE!!!
             if (update.getMessage().getText().charAt(0) == '/'){
                 return commandHandler.answerCommand(update);
             } else if (update.getMessage().hasText()){
                 return messageHandler.answerMessage(update);
             }
         }
+        //todo А для пользователя бот как-будто умер
+        //todo Или сообщение, что команда не поддерживается, или отдельный обработчик ошибок
         throw new UnsupportedOperationException();
     }
 

@@ -11,13 +11,16 @@ import java.util.List;
 
 @Data
 @Component
+//todo А это здесь зачем?
 @NoArgsConstructor
 public class InlineDialog {
+
     private List<String> buttonsText;
 
     public InlineKeyboardMarkup getMarkup(){
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        //todo здесь по идеи поймаешь NPE, так как buttonsText не инициализирован
         for (int i = 0; i < this.buttonsText.size(); i += 2){
             List<InlineKeyboardButton> row = new ArrayList<>();
             InlineKeyboardButton button = new InlineKeyboardButton();
@@ -33,6 +36,7 @@ public class InlineDialog {
             rows.add(row);
         }
         keyboardMarkup.setKeyboard(rows);
+        //todo А this зачем?
         this.buttonsText.clear();
         return keyboardMarkup;
     }

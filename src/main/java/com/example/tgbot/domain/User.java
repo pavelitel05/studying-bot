@@ -21,16 +21,18 @@ public class User {
     @Column(name = "name", nullable = false)
     private String name;
 
+    //todo заменить на Enum
     @Column(name = "role")
     private String role;
 
     @Column(name = "module")
     private String module;
 
+    //todo Заменить на Enum
     @Column(name = "status")
     private String status;
 
-
+    //todo Аналогично с Timetable
     @Override
     public String toString() {
         return "User{" +

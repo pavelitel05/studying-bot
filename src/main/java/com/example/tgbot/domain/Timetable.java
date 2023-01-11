@@ -17,18 +17,21 @@ public class Timetable {
     @GenericGenerator(name = "increment", strategy = "increment")
     private Long id;
 
+    //todo Заменить на LocalDate / Date
     @Column(name = "dateTime")
     private String dateTime;
 
+    //todo Связь с user
     @Column(name = "student", nullable = false)
     private String studentName;
-
     @Column(name = "topic")
     private String topic;
 
+    //todo А тип точно String?
     @Column(name = "mark")
     private String mark;
 
+    //todo Сюда lombok'овский toString можно
     @Override
     public String toString() {
         return "Timetable{" +

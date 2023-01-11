@@ -24,6 +24,7 @@ public class TimetableService {
         return timetableRepository.findByStudentName(studentName);
     }
 
+    //todo Название так себе
     public void setEntryInTimetable(Timetable timetable){
         timetableRepository.save(timetable);
     }

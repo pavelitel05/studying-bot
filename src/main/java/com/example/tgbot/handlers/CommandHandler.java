@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-
+//TODO Аналогично - @Component на @Service
 @Component
 @Slf4j
 public class CommandHandler {
@@ -32,6 +32,8 @@ public class CommandHandler {
     private TimetableService timetableService;
     @Autowired
     private ReplyDialog replyDialog;
+
+    //todo Заменить все на Enum'ы
     public BotApiMethod<?> answerCommand(Update update) {
         Message message = update.getMessage();
         switch (message.getText()){
@@ -58,6 +60,7 @@ public class CommandHandler {
         }
     }
 
+    //todo Тут тоже на Enum'ы заменить
     public BotApiMethod<?> setMyLessons(Message message){
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(message.getChatId());
@@ -75,6 +78,7 @@ public class CommandHandler {
                     }
                 });
                 if (validateFactor.get()){
+                    //todo ИМХО - выбор даты лучше через клавиатуру
                     sendMessage.setText("Некорректный формат ввода, повторите попытку!\n" +
                                         "Возможные проблемы:\n" +
                                         "Лишние пробелы\n" +
@@ -93,6 +97,7 @@ public class CommandHandler {
                 sendMessage.setReplyMarkup(new ReplyKeyboardMarkup());
             } else {
                 sendMessage.setText("Напишите ваше расписание в формате:\n" +
+                        //todo Формат указать вместо ч:м - чч:мм
                                     "День недели (Полностью) - время в формате (ч:м)\n" +
                                     "Например:\n" +
                                     "Понедельник - 12:00\n" +
@@ -100,19 +105,22 @@ public class CommandHandler {
                 user.setStatus("request-timetable");
                 userService.setUser(user);
             }
-        }else {
+        } else {
             sendMessage.setText("Извините, у вас нет доступа к использованию этой команды!");
         }
         return sendMessage;
     }
 
     public BotApiMethod<?> setLessonForStudent(Message message){
+        //todo Builder / Factory
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(message.getChatId());
+        //todo Заменить на Enum'ы
         if ("high".equals(authentication.getPermission(message.getChatId()))){
             User user = userService.getUserById(message.getChatId());
             if ("request-timetable".equals(user.getStatus())){
                 String[] entry = message.getText().split("\n");
+                //todo Нечитаемо без контекста, оставляй комменты
                 if (entry.length == 2) {
                     Timetable timetable = new Timetable();
                     timetable.setStudentName(entry[0]);
@@ -122,6 +130,7 @@ public class CommandHandler {
                     user.setStatus("authorized");
                     userService.setUser(user);
                 }else {
+                    //todo ИМХО опять же - сообщение вынести в private static final поля в начало класса или в отдельный класс (тогда public)
                     sendMessage.setText("Некорректный формат ввода, повторите попытку!");
                 }
             } else {

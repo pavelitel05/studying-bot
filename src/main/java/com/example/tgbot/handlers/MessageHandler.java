@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import javax.transaction.Transactional;
 
+//todo Аналогично интерфейс + @Service
 @Component
 public class MessageHandler {
     @Autowired
@@ -22,7 +23,7 @@ public class MessageHandler {
     @Autowired
     private CommandHandler commandHandler;
 
-    @Transactional
+    //todo Заменить стринги на ENUM
     public BotApiMethod<?> answerMessage(Update update) {
         SendMessage sendMessage = new SendMessage();
         Message receivedMessage = update.getMessage();

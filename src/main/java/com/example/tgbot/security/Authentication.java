@@ -5,6 +5,9 @@ import com.example.tgbot.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+
+//todo Если это сервис или компонент, то явно должно быть понятно что это
+//todo Например, AuthenticationService / AuthenticationProvider / AuthenticatorManager
 @Component
 public class Authentication {
     private final UserService userService;
@@ -15,9 +18,21 @@ public class Authentication {
     }
 
     public String getPermission(Long id){
+        //todo Делаешь лишний запрос, я бы сделал так:
+        //todo Первый запрос проверяет есть ли пользователь, а второй уже ищет.
+        //todo Возможно под капотом PostgreSQL закеширует это и времени не потеряем, но не уверен
+        /*
+
+        var user = userService.findUserById(id);
+        if (user != null) {
+            ...
+        }
+
+         */
         if (userService.existsById(id)){
             User user = userService.getUserById(id);
             String role = user.getRole();
+            //todo Заменить на Enum
             switch (role) {
                 case "Viewer":
                     return "low";
@@ -29,6 +44,7 @@ public class Authentication {
         } else {
             return "low";
         }
+        //todo Вот с этого вообще ахуел
         throw new NullPointerException();
     }
 }
