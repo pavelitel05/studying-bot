@@ -1,5 +1,6 @@
 package com.example.tgbot.handlers;
 
+import com.example.tgbot.domain.Status;
 import com.example.tgbot.domain.Timetable;
 import com.example.tgbot.domain.User;
 import com.example.tgbot.security.Authentication;
@@ -14,6 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -92,7 +94,7 @@ public class CommandHandler {
                     timetableService.setEntryInTimetable(timetable);
                 }
                 sendMessage.setText("Успешно!");
-                user.setStatus("authorized");
+                user.setStatus(Status.AUTHORIZED);
                 userService.setUser(user);
                 sendMessage.setReplyMarkup(new ReplyKeyboardMarkup());
             } else {
@@ -102,7 +104,7 @@ public class CommandHandler {
                                     "Например:\n" +
                                     "Понедельник - 12:00\n" +
                                     "Суббота - 16:15");
-                user.setStatus("request-timetable");
+                user.setStatus(Status.REQUEST_TIMETABLE);
                 userService.setUser(user);
             }
         } else {
