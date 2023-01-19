@@ -12,4 +12,8 @@ public class TelegramCommand {
     public static final String addMark = "/add_mark";
 
     public static final String deleteLessonForStudent = "/delete_lesson_for_student";
+
+    public static final  String setTopicToStudent = "/set_topic";
+
+    public static final String getMyTimetable = "/get_timetable";
 }
