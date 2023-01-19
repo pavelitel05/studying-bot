@@ -1,8 +1,11 @@
 package com.example.tgbot.security;
 
-import com.example.tgbot.domain.User;
-import com.example.tgbot.handlers.InlineDialog;
-import com.example.tgbot.services.UserService;
+import com.example.tgbot.entity.Role;
+import com.example.tgbot.entity.Status;
+import com.example.tgbot.entity.User;
+import com.example.tgbot.handler.InlineDialog;
+import com.example.tgbot.handler.SendMessageFactory;
+import com.example.tgbot.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -10,47 +13,42 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-
 import java.util.ArrayList;
 import java.util.List;
 
-//todo Если это сервис или компонент, то явно должно быть понятно что это
-//todo Например, AuthorizationService / AuthorizationProvider / AuthorizationManager
-//todo А нужна ли авторизация для телеги?
 @Component
-public class Authorization {
+public class AuthorizationManager {
     private final UserService userService;
-    private final InlineDialog inlineDialog;
+    private final InlineDialog inlineDialog = InlineDialog.getInlineDialog();
+    private final SendMessageFactory sendMessageFactory;
     @Autowired
-    public Authorization(UserService userService, InlineDialog inlineDialog) {
+    public AuthorizationManager(UserService userService,
+                                SendMessageFactory sendMessageFactory) {
         this.userService = userService;
-        this.inlineDialog = inlineDialog;
+        this.sendMessageFactory = sendMessageFactory;
     }
 
-    //todo Мб вынес бы в проперти, а туда уже из ENV
     private final String adminPassword = System.getenv("ADMIN_ID");
 
     private final String studentPassword = System.getenv("STUDENT_PASSWORD");
 
     public BotApiMethod<?> checkPassword(Message message){
         User user = userService.getUserById(message.getChatId());
-        SendMessage sendMessage = new SendMessage();
+        SendMessage sendMessage = sendMessageFactory.getSendMessage(message);
         String messageText = message.getText();
-        sendMessage.setChatId(message.getChatId());
-        //todo Такие моменты лучше комментить, потом забудешь
         if (messageText.matches("[0-9]{3,}")){
             if (messageText.equals(adminPassword)){
-                user.setRole("Teacher");
+                user.setRole(Role.TEACHER);
             } else if (messageText.equals(studentPassword)){
-                user.setRole("Student");
+                user.setRole(Role.STUDENT);
             }
-            user.setStatus("request-name");
+            user.setStatus(Status.REQUEST_NAME);
             userService.setUser(user);
             sendMessage.setText("Введите ФИО через пробел");
         } else {
             sendMessage.setText("Не знаю такого пароля!\n Нарекаю вас наблюдателем");
-            user.setStatus("request-name");
-            user.setRole("Viewer");
+            user.setStatus(Status.REQUEST_NAME);
+            user.setRole(Role.VIEWER);
             userService.setUser(user);
         }
         return sendMessage;
@@ -58,16 +56,14 @@ public class Authorization {
 
     public BotApiMethod<?> setName(Message message){
         User user = userService.getUserById(message.getChatId());
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(message.getChatId());
+        SendMessage sendMessage = sendMessageFactory.getSendMessage(message);
         String messageText = message.getText();
         if (messageText.matches("[А-я]{2,} [А-я]{2,} [А-я]{2,}")){
             user.setName(messageText);
-            user.setStatus("request-module");
+            user.setStatus(Status.REQUEST_MODULE);
             userService.setUser(user);
             sendMessage.setText("Выберите предметную область");
             List<String> buttons = new ArrayList<>();
-            //todo ИМХО - предметы в отдельную табличку/массив
             buttons.add("ЕГЭ");
             buttons.add("ОГЭ");
             buttons.add("Python");
@@ -87,14 +83,10 @@ public class Authorization {
     public BotApiMethod<?> setModule(Update update){
         CallbackQuery callbackQuery = update.getCallbackQuery();
         User user = userService.getUserById(callbackQuery.getMessage().getChatId());
-        //todo создание SendMessage вынес бы в отдельную фабрику или используй билдер (SendMessage.builder()...build())
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(callbackQuery.getMessage().getChatId());
-        //todo ИМХО - заменил бы на "Привет, <Имя Фамилия>"
+        SendMessage sendMessage = sendMessageFactory.getSendMessage(update.getCallbackQuery());
         sendMessage.setText("Успешно!");
         user.setModule(callbackQuery.getData());
-        //todo Вообще не понял зачем это
-        user.setStatus("authorized");
+        user.setStatus(Status.AUTHORIZED);
         userService.setUser(user);
         return sendMessage;
     }

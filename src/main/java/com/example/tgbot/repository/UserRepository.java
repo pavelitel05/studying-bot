@@ -1,6 +1,6 @@
-package com.example.tgbot.repositories;
+package com.example.tgbot.repository;
 
-import com.example.tgbot.domain.User;
+import com.example.tgbot.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

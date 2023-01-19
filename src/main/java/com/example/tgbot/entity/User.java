@@ -1,4 +1,4 @@
-package com.example.tgbot.domain;
+package com.example.tgbot.entity;
 
 import lombok.Getter;
 import lombok.Setter;

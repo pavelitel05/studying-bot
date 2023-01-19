@@ -1,10 +1,8 @@
-package com.example.tgbot.handlers;
+package com.example.tgbot.handler;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
@@ -12,16 +10,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@Component
-//todo Аналогично - зачем?
-@NoArgsConstructor
 public class ReplyDialog {
+    private static ReplyDialog replyDialog;
+
+    private ReplyDialog(){}
+
+    public static ReplyDialog getReplyDialog() {
+        if (replyDialog == null){
+            replyDialog = new ReplyDialog();
+        }
+        return replyDialog;
+    }
     private List<String> buttonsText;
+
+    public void addButtonText(String buttonText){
+        buttonsText.add(buttonText);
+    }
 
     public ReplyKeyboardMarkup getMarkup(){
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         List<KeyboardRow> rows = new ArrayList<>();
-        //todo Аналогично - NPE?
         for (int i = 0; i < this.buttonsText.size(); i += 2){
             KeyboardRow row = new KeyboardRow();
             KeyboardButton button = new KeyboardButton();

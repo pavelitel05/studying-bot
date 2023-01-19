@@ -1,16 +1,16 @@
-package com.example.tgbot.services;
+package com.example.tgbot.service;
 
-import com.example.tgbot.domain.User;
-import com.example.tgbot.repositories.UserRepository;
+import com.example.tgbot.entity.User;
+import com.example.tgbot.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 
-@Component
 @Slf4j
+@Service
 public class UserService {
     private final UserRepository userRepository;
 
@@ -28,11 +28,12 @@ public class UserService {
         return userRepository.existsById(id);
     }
     public User getUserById(Long id){
-        if (userRepository.findById(id).isPresent()){
-            return userRepository.findById(id).get();
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isPresent()){
+            return userOptional.get();
         }
         log.info("Nu such user with id: " + id);
-        throw new NoSuchElementException();
+        return null;
     }
 
     public boolean deleteUser(User user){
@@ -54,11 +55,12 @@ public class UserService {
     }
 
     public List<User> getUsers(){
-        if (userRepository.findAll() != null){
-            return userRepository.findAll();
+        List<User> users = userRepository.findAll();
+        if (users != null){
+            return users;
         }
         log.info("Nu users yet");
-        throw new NoSuchElementException();
+        return null;
     }
 
     public User getUserByName(String name){
@@ -66,6 +68,6 @@ public class UserService {
             return userRepository.findUserByName(name).get();
         }
         log.info("Nu such user with name" + name);
-        throw new NoSuchElementException();
+        return null;
     }
 }

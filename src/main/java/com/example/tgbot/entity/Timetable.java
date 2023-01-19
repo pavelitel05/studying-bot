@@ -1,21 +1,15 @@
-package com.example.tgbot.domain;
+package com.example.tgbot.entity;
 
-import com.example.tgbot.services.TimetableService;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.sql.Time;
-import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
 @Table(name = "timetable")
 @Getter
 @Setter
-@ToString
 public class Timetable {
     @Id
     @Column(name = "id", nullable = false)
@@ -30,18 +24,26 @@ public class Timetable {
     private String studentName;
 
     @Column(name = "week_day")
-    private WeekDay weekDay;
+    private String weekDay;
 
     @Column(name = "time")
-    private Time time;
+    private String time;
 
     @Column(name = "topic")
     private String topic;
 
-    @Column(name = "mark")
-    private String mark;
+    @Column(name = "bookmark")
+    private String bookmark;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "student_id")
+    @JoinColumn(name = "student_id", insertable = false, updatable = false)
     private User user;
+
+    @Override
+    public String toString(){
+        return weekDay + " - " + time;
+    }
 }
